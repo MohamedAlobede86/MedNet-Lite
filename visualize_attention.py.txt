@@ -1,0 +1,47 @@
+import torch
+import matplotlib.pyplot as plt
+from sklearn.metrics import precision_recall_curve, average_precision_score
+
+def plot_attention_overlay(model, X_test, num_samples=5):
+    model.eval()
+    for i in range(min(num_samples, X_test.size(0))):
+        sample = X_test[i].unsqueeze(0)
+        with torch.no_grad():
+            _, _, _, _, attention_map = model(sample)
+
+        if attention_map is not None and attention_map.numel() > 0:
+            attention = attention_map.squeeze().detach().cpu().numpy()
+            signal = sample.squeeze().cpu().numpy()
+
+            plt.figure(figsize=(8, 4))
+            plt.plot(signal, label='Signal', color='blue', linewidth=2)
+            plt.plot(attention, label='Attention Map', color='red', linestyle='--', linewidth=2)
+            plt.title(f'Waveform vs Attention Overlay – Sample {i+1}')
+            plt.xlabel('Time Index')
+            plt.ylabel('Amplitude / Attention Weight')
+            plt.legend()
+            plt.grid(True)
+            plt.tight_layout()
+            plt.show()
+
+def plot_precision_recall(model, X_test, y_test):
+    model.eval()
+    with torch.no_grad():
+        y_scores_tensor, *_ = model(X_test)
+        y_scores = torch.sigmoid(y_scores_tensor).cpu().numpy().flatten()
+        y_true = y_test.cpu().numpy().flatten()
+
+    precision, recall, _ = precision_recall_curve(y_true, y_scores)
+    ap_score = average_precision_score(y_true, y_scores)
+
+    plt.figure(figsize=(8, 6))
+    plt.plot(recall, precision, color='blue', linewidth=2, label=f'AP = {ap_score:.4f}')
+    plt.xlabel('Recall')
+    plt.ylabel('Precision')
+    plt.title('Precision-Recall Curve – MedNet-Lite')
+    plt.legend(loc='lower left')
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
+
+    print(f"Average Precision (AP): {ap_score:.4f}")

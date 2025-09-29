@@ -1,0 +1,24 @@
+import pandas as pd
+import torch
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MinMaxScaler
+
+def load_and_preprocess_data(filepath):
+    df = pd.read_csv(filepath)
+    df.columns = df.columns.str.strip()
+    features = ['a1', 'a2', 'a3', 'a4', 'a5']
+    X = df[features].dropna().values
+
+    # Normalize features
+    scaler = MinMaxScaler()
+    X_scaled = scaler.fit_transform(X)
+
+    # Generate synthetic labels
+    y = (X_scaled.mean(axis=1) > 0.5).astype(int)
+
+    # Convert to tensors
+    X_tensor = torch.tensor(X_scaled, dtype=torch.float32).unsqueeze(1)
+    y_tensor = torch.tensor(y, dtype=torch.float32).unsqueeze(1)
+
+    # Stratified split
+    return train_test_split(X_tensor, y_tensor, test_size=0.3, stratify=y_tensor, random_state=42)
