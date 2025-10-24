@@ -15,7 +15,7 @@ MedNet-Lite is a compact and interpretable convolutional neural network designed
 
 ## 🧪 Dataset
 
-The dataset used in this study was sourced from the [Waveform Biomedical Signals Repository on Kaggle](https://www.kaggle.com/datasets/your-dataset-link).  
+The dataset used in this study was sourced from the https://www.kaggle.com/datasets/medben99/waveformcsv.  
 It contains 5,000 samples, each with 5 time points across a single physiological channel.  
 Binary labels were assigned using a threshold-based criterion:  
 - **Class 1 (Critical)**: mean normalized value > 0.5  
